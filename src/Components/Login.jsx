@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
+// import axios from 'axios';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -11,21 +11,28 @@ const Login = () => {
     const navigate = useNavigate();
     const handleLogin = async (e) => {
         e.preventDefault();
-        try {
-            const response = await axios.post(`${hostname}/api/auth/signin`, {
-                username,
-                password,
-            });
-
-            if (response.status === 200) {
-                navigate('/admin');
-            } else {
-                toast.error('Invalid Credentials');
-            }
-        } catch (error) {
-            toast.error('Internal Server Error');
-            console.error('Error logging in:', error);
-        }
+        toast("Coming Soon!!");
+        // try {
+        //     const url = `${hostname}/api/auth/signin`
+        //     const config = {
+        //         method: "POST",
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({ username, password })
+        //     };
+        //     let res = await fetch(url, config);
+        //     res = await res.json();
+        //     console.log(res);
+        //     if (res.success) {
+        //         navigate('/admin');
+        //     } else {
+        //         toast.error('Invalid Credentials');
+        //     }
+        // } catch (error) {
+        //     toast.error('Internal Server Error');
+        //     console.error('Error logging in:', error);
+        // }
     };
 
     return (

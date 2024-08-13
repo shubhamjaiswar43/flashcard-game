@@ -2,12 +2,15 @@ const { getFlashcards, addFlashcard, updateFlashcard, deleteFlashcard, getFlashc
 
 // Get all flashcards
 const getFlashCard = async (req, res) => {
+    const { page = 1, pageSize = 10 } = req.query;
+    const offset = (page - 1) * pageSize;
+
     try {
-        const flashcards = await getFlashcards();
-        res.json({ success: true, flashcards });
-    } catch (err) {
-        console.error('Error retrieving flashcards:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        const result = await getFlashcards(pageSize, offset);
+        res.json({ success: true, ...result });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Failed to fetch flashcards' });
     }
 };
 

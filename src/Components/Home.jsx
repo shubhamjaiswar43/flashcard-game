@@ -11,9 +11,9 @@ const Home = () => {
             </header>
 
             <main className="flex-grow flex items-center justify-center">
-                <a href="/game" className="bg-yellow-400 hover:bg-yellow-500 text-blue-800 font-semibold text-2xl py-4 px-8 rounded-full shadow-lg transform transition-transform duration-200 hover:scale-105">
+                <Link to="/flashcards" className="bg-yellow-400 hover:bg-yellow-500 text-blue-800 font-semibold text-2xl py-4 px-8 rounded-full shadow-lg transform transition-transform duration-200 hover:scale-105">
                     Get Started
-                </a>
+                </Link>
             </main>
 
             <footer className="w-full text-center py-8">

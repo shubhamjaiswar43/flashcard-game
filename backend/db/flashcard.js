@@ -1,11 +1,11 @@
 const pool = require('./connection');
 
 // Retrieve all flashcards
-const getFlashcards = async () => {
+const getFlashcards = async (pageSize, offset) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM flashcards');
-        console.log(rows);
-        return rows;
+        const [flashcards] = await pool.query('SELECT * FROM flashcards LIMIT ? OFFSET ?', [parseInt(pageSize), offset]);
+        const [totalRows] = await pool.query('SELECT COUNT(*) AS count FROM flashcards');
+        return { flashcards, total: totalRows[0].count };
     } catch (err) {
         console.error('Error fetching flashcards:', err);
         throw err;
