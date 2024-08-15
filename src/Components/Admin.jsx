@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Snackbar } from '@mui/material';
 import Pagination from '@mui/material/Pagination';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Admin = () => {
+    const navigate = useNavigate();
     const [flashcards, setFlashcards] = useState([]);
     const [page, setPage] = useState(1);
-    const [pageSize] = useState(5); // Fixed page size, or you could make this dynamic
+    const [pageSize] = useState(5);
     const [total, setTotal] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogType, setDialogType] = useState('add'); // 'add', 'update', or 'delete'
@@ -15,22 +17,23 @@ const Admin = () => {
     const [form, setForm] = useState({
         question: '',
         answer: '',
-        question_image: null,
-        answer_image: null,
+        // question_image: null,
+        // answer_image: null,
     });
 
     useEffect(() => {
+        if (!localStorage.getItem('isAdmin'))
+            navigate('/');
         fetchFlashcards();
     }, [page]);
 
     const fetchFlashcards = async () => {
         try {
-            const url = `${import.meta.env.VITE_BACKENDHOST}/api/flashcard/get?page=${page}&pageSize=${pageSize}`;
-            console.log(url);
+            const url = `${import.meta.env.VITE_BACKENDHOST}/api/flashcard?page=${page}&pageSize=${pageSize}`;
             const res = await axios.get(url);
             console.log(res);
-            // setFlashcards(data.flashcards);
-            // setTotal(data.total);
+            setFlashcards(res.data.flashcards);
+            setTotal(res.data.total);
         } catch (error) {
             toast.error('Failed to fetch flashcards');
         }
@@ -45,8 +48,8 @@ const Admin = () => {
             setForm({
                 question: '',
                 answer: '',
-                question_image: null,
-                answer_image: null,
+                // question_image: null,
+                // answer_image: null,
             });
         }
         setOpenDialog(true);
@@ -64,18 +67,36 @@ const Admin = () => {
             [name]: files ? files[0] : value,
         }));
     };
-
+    const makeAPICall = async (url, method, body) => {
+        let res = await await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'authToken': localStorage.getItem('authToken')
+            },
+            body
+        });
+        res = await res.json();
+        return res.success;
+    }
     const handleSubmit = async () => {
         try {
+            const url = `${import.meta.env.VITE_BACKENDHOST}/api/flashcard`;
             if (dialogType === 'add') {
-                await axios.post('/api/flashcards', form, { headers: { 'Content-Type': 'multipart/form-data' } });
-                toast.success('Flashcard added');
+                if (await makeAPICall(url + '/add', "POST", JSON.stringify(form)))
+                    toast.success('Flashcard added');
+                else
+                    toast.error('Something Went Wrong');
             } else if (dialogType === 'update') {
-                await axios.put(`/api/flashcards/${selectedFlashcard.id}`, form, { headers: { 'Content-Type': 'multipart/form-data' } });
-                toast.success('Flashcard updated');
+                if (await makeAPICall(`${url}/update/${form.id}`, "PUT", JSON.stringify(form)))
+                    toast.success('Flashcard updated');
+                else
+                    toast.error('Something Went Wrong');
             } else if (dialogType === 'delete') {
-                await axios.delete(`/api/flashcards/${selectedFlashcard.id}`);
-                toast.success('Flashcard deleted');
+                if (await makeAPICall(`${url}/delete/${form.id}`, "DELETE", null))
+                    toast.success('Flashcard deleted');
+                else
+                    toast.error('Something Went Wrong');
             }
             fetchFlashcards();
             handleCloseDialog();
@@ -83,17 +104,31 @@ const Admin = () => {
             toast.error('Failed to perform the operation');
         }
     };
-
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        navigate('/');
+    }
     return (
         <div className="p-4">
+            <ToastContainer />
+            <Button sx={{ marginRight: '10px' }} variant="contained" color="primary" onClick={() => navigate('/')}>Home</Button>
+            <Button sx={{ marginRight: '10px' }} variant="contained" color="primary" onClick={() => navigate('/flashcards')}>Flashcards</Button>
             <Button variant="contained" color="primary" onClick={() => handleOpenDialog('add')}>Add Flashcard</Button>
+            <Button sx={{
+                float: 'right',
+                backgroundColor: '#f00000',
+                color: 'white',
+                '&:hover': {
+                    backgroundColor: 'darkred'
+                }
+            }} variant="contained" onClick={handleLogout}>Log Out</Button>
             <div className="mt-4">
                 {flashcards.map((flashcard) => (
                     <div key={flashcard.id} className="mb-4 p-4 border border-gray-300 rounded">
                         <div className="flex justify-between items-center">
                             <h3 className="text-lg font-semibold">{flashcard.question}</h3>
                             <div>
-                                <Button variant="contained" color="secondary" onClick={() => handleOpenDialog('update', flashcard)}>Update</Button>
+                                <Button sx={{ marginRight: '10px' }} variant="contained" color="secondary" onClick={() => handleOpenDialog('update', flashcard)}>Update</Button>
                                 <Button variant="outlined" color="error" onClick={() => handleOpenDialog('delete', flashcard)}>Delete</Button>
                             </div>
                         </div>
@@ -128,7 +163,7 @@ const Admin = () => {
                         value={form.answer}
                         onChange={handleChange}
                     />
-                    <input
+                    {/* <input
                         type="file"
                         name="question_image"
                         accept="image/*"
@@ -139,7 +174,7 @@ const Admin = () => {
                         name="answer_image"
                         accept="image/*"
                         onChange={handleChange}
-                    />
+                    /> */}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog} color="primary">Cancel</Button>

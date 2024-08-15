@@ -13,11 +13,11 @@ const getFlashcards = async (pageSize, offset) => {
 };
 
 // Add a new flashcard
-const addFlashcard = async (question, answer, questionImage, answerImage) => {
+const addFlashcard = async (question, answer) => {
     try {
         const [result] = await pool.query(
-            'INSERT INTO flashcards (question, answer, question_image, answer_image) VALUES (?, ?, ?, ?)',
-            [question, answer, questionImage, answerImage]
+            'INSERT INTO flashcards (question, answer) VALUES (?, ?)',
+            [question, answer]
         );
         console.log('Flashcard added with ID:', result.insertId);
         return result.insertId;
@@ -28,11 +28,11 @@ const addFlashcard = async (question, answer, questionImage, answerImage) => {
 };
 
 // Update an existing flashcard
-const updateFlashcard = async (id, question, answer, questionImage, answerImage) => {
+const updateFlashcard = async (id, question, answer) => {
     try {
         const [result] = await pool.query(
-            'UPDATE flashcards SET question = ?, answer = ?, question_image = ?, answer_image = ? WHERE id = ?',
-            [question, answer, questionImage, answerImage, id]
+            'UPDATE flashcards SET question = ?, answer = ? WHERE id = ?',
+            [question, answer, id]
         );
         console.log('Flashcard updated:', result.affectedRows);
         return result.affectedRows;

@@ -11,28 +11,30 @@ const Login = () => {
     const navigate = useNavigate();
     const handleLogin = async (e) => {
         e.preventDefault();
-        toast("Coming Soon!!");
-        // try {
-        //     const url = `${hostname}/api/auth/signin`
-        //     const config = {
-        //         method: "POST",
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify({ username, password })
-        //     };
-        //     let res = await fetch(url, config);
-        //     res = await res.json();
-        //     console.log(res);
-        //     if (res.success) {
-        //         navigate('/admin');
-        //     } else {
-        //         toast.error('Invalid Credentials');
-        //     }
-        // } catch (error) {
-        //     toast.error('Internal Server Error');
-        //     console.error('Error logging in:', error);
-        // }
+        try {
+            const url = `${hostname}/api/auth/signin`
+            console.log(url);
+            const config = {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            };
+            let res = await fetch(url, config);
+            res = await res.json();
+            console.log(res);
+            if (res.success) {
+                localStorage.setItem('isAdmin', true);
+                localStorage.setItem('authToken', res.authToken);
+                navigate('/admin');
+            } else {
+                toast.error('Invalid Credentials');
+            }
+        } catch (error) {
+            toast.error(error.message);
+            console.error('Error logging in:', error);
+        }
     };
 
     return (
