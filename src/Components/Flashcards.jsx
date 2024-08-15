@@ -53,12 +53,6 @@ const Flashcards = () => {
     }
 
     const { id, question, answer } = flashcards[currentIndex];
-    function getRandomInteger(min, max) {
-        if (min > max) {
-            throw new Error('Min should be less than or equal to Max');
-        }
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <button
